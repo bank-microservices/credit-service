@@ -135,8 +135,8 @@ public class CreditServiceImpl implements CreditService {
         return creditRepository.findById(id)
                 .switchIfEmpty(Mono.error(new DataValidationException("Credit not found")))
                 .map(credit -> {
-                    double totalAmount = Double.sum(creditLimit, credit.getCreditLimit());
-                    credit.setAmount(totalAmount);
+                    double totalLimit = Double.sum(creditLimit, credit.getCreditLimit());
+                    credit.setCreditLimit(totalLimit);
                     return credit;
                 })
                 .flatMap(creditRepository::save)
