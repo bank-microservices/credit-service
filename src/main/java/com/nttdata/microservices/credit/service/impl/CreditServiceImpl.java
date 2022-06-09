@@ -129,15 +129,26 @@ public class CreditServiceImpl implements CreditService {
                 .map(creditMapper::toDto);
     }
 
-
+    /**
+     * Search for a credit by id, if it does not exist it throws an error and checks
+     * if the new credit limit is less than the amount of the current credit, if so
+     * it throws an error, otherwise it updates the credit limit
+     * 
+     * @param id          credit id
+     * @param creditLimit The new credit limit
+     * @return A Mono of CreditDto
+     */
     @Override
     public Mono<CreditDto> updateCreditLimit(String id, Double creditLimit) {
         return creditRepository.findById(id)
                 .switchIfEmpty(Mono.error(new DataValidationException("Credit not found")))
                 .map(credit -> {
-                    double totalLimit = Double.sum(creditLimit, credit.getCreditLimit());
-                    credit.setCreditLimit(totalLimit);
-                    return credit;
+                    if (credit.getAmount() > creditLimit) {
+                        throw new BadRequestException("The new credit limit is less than the current credit amount");
+                    } else {
+                        credit.setCreditLimit(creditLimit);
+                        return credit;
+                    }
                 })
                 .flatMap(creditRepository::save)
                 .map(creditMapper::toDto);
