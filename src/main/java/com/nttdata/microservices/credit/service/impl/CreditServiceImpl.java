@@ -1,20 +1,23 @@
 package com.nttdata.microservices.credit.service.impl;
 
+import java.time.LocalDateTime;
+
+import org.springframework.stereotype.Service;
+
 import com.nttdata.microservices.credit.entity.Credit;
 import com.nttdata.microservices.credit.entity.client.ClientType;
+import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.DataValidationException;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditRepository;
 import com.nttdata.microservices.credit.service.CreditService;
 import com.nttdata.microservices.credit.service.dto.CreditDto;
 import com.nttdata.microservices.credit.service.mapper.CreditMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -80,18 +83,16 @@ public class CreditServiceImpl implements CreditService {
                 .doOnNext(creditDto::setClient)
                 .then(creditRepository.findByAccountNumber(creditDto.getAccountNumber())
                         .flatMap(r -> Mono.error(new DataValidationException("Account number already has a credit")))
-                        .then()
-                )
+                        .then())
                 .then(creditRepository.findByClientDocumentNumber(creditDto.getClientDocumentNumber())
                         .count()
-                        .<Long>handle((record, sink) -> {
-                            if (record > 0 && creditDto.getClient().getClientType() == ClientType.PERSONAL) {
+                        .<Long>handle((item, sink) -> {
+                            if (item > 0 && creditDto.getClient().getClientType() == ClientType.PERSONAL) {
                                 sink.error(new DataValidationException("Personal customer already has a credit"));
                             } else {
                                 sink.complete();
                             }
-                        })
-                )
+                        }))
                 .then(Mono.just(creditDto)
                         .flatMap(dto -> {
                             Credit credit = creditMapper.toEntity(dto);
@@ -104,7 +105,8 @@ public class CreditServiceImpl implements CreditService {
 
     /**
      * Find the credit by id, then map the creditDto to an entity, then set the id
-     * of the entity to the id of the credit, then save the entity, then map the entity to a dto.
+     * of the entity to the id of the credit, then save the entity, then map the
+     * entity to a dto.
      *
      * @param id           The id of the credit to be updated
      * @param creditAmount Amount to increase in the credit
@@ -116,6 +118,24 @@ public class CreditServiceImpl implements CreditService {
                 .switchIfEmpty(Mono.error(new DataValidationException("Credit not found")))
                 .map(credit -> {
                     double totalAmount = Double.sum(creditAmount, credit.getAmount());
+                    if (totalAmount > credit.getCreditLimit()) {
+                        throw new BadRequestException("The new credit amount exceeds the Credit Limit");
+                    } else {
+                        credit.setAmount(totalAmount);
+                        return credit;
+                    }
+                })
+                .flatMap(creditRepository::save)
+                .map(creditMapper::toDto);
+    }
+
+
+    @Override
+    public Mono<CreditDto> updateCreditLimit(String id, Double creditLimit) {
+        return creditRepository.findById(id)
+                .switchIfEmpty(Mono.error(new DataValidationException("Credit not found")))
+                .map(credit -> {
+                    double totalAmount = Double.sum(creditLimit, credit.getCreditLimit());
                     credit.setAmount(totalAmount);
                     return credit;
                 })

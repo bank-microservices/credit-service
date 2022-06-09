@@ -19,4 +19,6 @@ public interface CreditService {
     Mono<CreditDto> createCredit(CreditDto creditDto);
 
     Mono<CreditDto> updateCreditAmount(String id, Double creditAmount);
+
+    Mono<CreditDto> updateCreditLimit(String id, Double creditLimit);
 }

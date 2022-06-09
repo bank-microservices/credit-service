@@ -96,10 +96,32 @@ public class CreditController {
         return creditService.createCredit(creditDto);
     }
 
+    /**
+     * It takes a credit id and an amount, and updates the credit amount with the
+     * given amount
+     * 
+     * @param id     The id of the credit to update
+     * @param amount The amount of credit to be added to the account.
+     * @return A Mono of CreditDto
+     */
     @PutMapping("/amount/{id}/{amount}")
     @ResponseStatus(HttpStatus.OK)
-    private Mono<CreditDto> updateAmount(@PathVariable String id, @PathVariable Double amount) {
+    public Mono<CreditDto> updateAmount(@PathVariable String id, @PathVariable Double amount) {
         return creditService.updateCreditAmount(id, amount);
+    }
+
+    /**
+     * It takes a credit id and a new limit, and returns a Mono of the updated
+     * CreditDto
+     * 
+     * @param id    The id of the credit to update
+     * @param limit The new credit limit to be set.
+     * @return A Mono of CreditDto
+     */
+    @PutMapping("/limit/{id}/{limit}")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<CreditDto> updateCreditLimit(@PathVariable String id, @PathVariable Double limit) {
+        return creditService.updateCreditLimit(id, limit);
     }
 
 }

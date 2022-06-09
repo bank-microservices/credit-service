@@ -1,5 +1,6 @@
 package com.nttdata.microservices.credit.exceptionhandler;
 
+import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.ClientNotFoundException;
 import com.nttdata.microservices.credit.exception.DataValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,12 @@ public class GlobalErrorHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleClientException(BadRequestException ex) {
+        log.error("Exception caught in handleClientException :  {} ", ex.getMessage(), ex);        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(ClientNotFoundException.class)
     public ResponseEntity<String> handleClientException(ClientNotFoundException ex) {
         log.error("Exception caught in handleClientException :  {} ", ex.getMessage(), ex);
@@ -37,7 +44,7 @@ public class GlobalErrorHandler {
     @ExceptionHandler(DataValidationException.class)
     public ResponseEntity<String> handleMovieInfoNotfoundException(DataValidationException ex) {
         log.error("Exception caught in handleMovieInfoNotfoundException :  {} ", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.valueOf(ex.getStatusCode())).body(ex.getMessage());
     }
 
 }
