@@ -2,6 +2,7 @@ package com.nttdata.microservices.credit.controller;
 
 import com.nttdata.microservices.credit.service.CreditCardService;
 import com.nttdata.microservices.credit.service.dto.CreditCardDto;
+import com.nttdata.microservices.credit.util.ResponseUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +63,18 @@ public class CreditCardController {
     @GetMapping("/client/{number}")
     public Flux<CreditCardDto> findByClientDocumentNumber(@PathVariable String number) {
         return cardService.findByClientDocumentNumber(number);
+    }
+
+    /**
+     * Find a credit by its id and return it with its card.
+     *
+     * @param accountNumber The
+     * @return A Mono of CreditDto
+     */
+    @GetMapping("/account/{number}")
+    public Mono<ResponseEntity<CreditCardDto>> findByAccountNumber(@PathVariable("number") String accountNumber) {
+        Mono<CreditCardDto> dtoMono = cardService.findByAccountNumber(accountNumber);
+        return ResponseUtil.wrapOrNotFound(dtoMono);
     }
 
 

@@ -1,9 +1,5 @@
 package com.nttdata.microservices.credit.service.impl;
 
-import java.time.LocalDateTime;
-
-import org.springframework.stereotype.Service;
-
 import com.nttdata.microservices.credit.entity.Credit;
 import com.nttdata.microservices.credit.entity.client.ClientType;
 import com.nttdata.microservices.credit.exception.BadRequestException;
@@ -13,11 +9,13 @@ import com.nttdata.microservices.credit.repository.CreditRepository;
 import com.nttdata.microservices.credit.service.CreditService;
 import com.nttdata.microservices.credit.service.dto.CreditDto;
 import com.nttdata.microservices.credit.service.mapper.CreditMapper;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -50,9 +48,16 @@ public class CreditServiceImpl implements CreditService {
         return creditRepository.findByClientId(clientId);
     }
 
+    /**
+     * Find a credit by account number and map it to a creditDto
+     * 
+     * @param accountNumber String
+     * @return Mono<CreditDto>
+     */
     @Override
-    public Mono<CreditDto> findWithCardByCreditId(String creditId) {
-        return creditRepository.findWithCardByCreditId(creditId);
+    public Mono<CreditDto> findByAccountNumber(String accountNumber) {
+        return creditRepository.findByAccountNumber(accountNumber)
+                .map(creditMapper::toDto);
     }
 
     /**
@@ -122,6 +127,7 @@ public class CreditServiceImpl implements CreditService {
                         throw new BadRequestException("The new credit amount exceeds the Credit Limit");
                     } else {
                         credit.setAmount(totalAmount);
+                        credit.setLastModifiedDate(LocalDateTime.now());
                         return credit;
                     }
                 })
@@ -147,6 +153,7 @@ public class CreditServiceImpl implements CreditService {
                         throw new BadRequestException("The new credit limit is less than the current credit amount");
                     } else {
                         credit.setCreditLimit(creditLimit);
+                        credit.setLastModifiedDate(LocalDateTime.now());
                         return credit;
                     }
                 })

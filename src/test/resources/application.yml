@@ -1,0 +1,10 @@
+spring:
+  mongodb:
+    embedded:
+      version: 3.4.5
+
+service:
+  client:
+    uri: http://localhost:8081/api/client
+  account:
+    uri: http://localhost:8085/api/v1/account

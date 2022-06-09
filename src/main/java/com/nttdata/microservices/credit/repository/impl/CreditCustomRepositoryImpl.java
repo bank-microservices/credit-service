@@ -41,15 +41,6 @@ public class CreditCustomRepositoryImpl implements CreditCustomRepository {
     }
 
     @Override
-    public Mono<CreditDto> findWithCardByCreditId(String creditId) {
-        LookupOperation lookup = Aggregation.lookup("credit_card", "creditCardId", "_id", "creditCard");
-        UnwindOperation unwindOperation = new UnwindOperation(Fields.field("$creditCard"));
-        MatchOperation matchStage = Aggregation.match(Criteria.where("_id").is(new ObjectId(creditId)));
-        Aggregation aggregation = Aggregation.newAggregation(matchStage, lookup, unwindOperation);
-        return reactiveMongoTemplate.aggregate(aggregation, Credit.class, CreditDto.class).singleOrEmpty();
-    }
-
-    @Override
     public Flux<CreditDto> findByClientDocumentNumber(String documentNumber) {
         Aggregation aggregation = getAggregationCredit("client.documentNumber", documentNumber);
         return reactiveMongoTemplate.aggregate(aggregation, Credit.class, CreditDto.class);

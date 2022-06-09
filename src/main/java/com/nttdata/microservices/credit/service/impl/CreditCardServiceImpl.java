@@ -34,7 +34,7 @@ public class CreditCardServiceImpl implements CreditCardService {
      */
     @Override
     public Mono<CreditCardDto> findById(String id) {
-        log.debug("Request to get Credit Card : {}", id);
+        log.debug("Request to get Credit Card by Id: {}", id);
         return cardRepository.findById(id)
                 .map(cardMapper::toDto);
     }
@@ -52,13 +52,27 @@ public class CreditCardServiceImpl implements CreditCardService {
                 .map(cardMapper::toDto);
     }
 
+    /**
+     * Find a credit with a card by credit id.
+     *
+     * @param accountNumber the accountNumber of the credit
+     * @return Mono<CreditDto>
+     */
+    @Override
+    public Mono<CreditCardDto> findByAccountNumber(String accountNumber) {
+        log.debug("Request to get Credit Card by accountNumber: {}", accountNumber);
+        return cardRepository.findByAccountNumber(accountNumber);
+    }
+
     @Override
     public Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber) {
+        log.debug("Request to get Credit Card by Client documentNumber: {}", documentNumber);
         return cardRepository.findByClientDocumentNumber(documentNumber);
     }
 
     @Override
     public Mono<CreditCardDto> findByCardNumber(String cardNumber) {
+        log.debug("Request to create Credit Card : {}", cardNumber);
         return cardRepository.findByCardNumber(cardNumber)
                 .flatMap(card -> accountProxy.findByAccountNumber(card.getAccount().getAccountNumber())
                         .flatMap(account -> {
@@ -91,6 +105,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     private Mono<CreditCardDto> existClient(CreditCardDto cardDto) {
+        log.debug("Request to proxy Client by documentNumber: {}", cardDto.getClient().getDocumentNumber());
         return clientProxy.getClientByDocumentNumber(cardDto.getClientDocumentNumber())
                 .switchIfEmpty(Mono.error(new DataValidationException("Client not found")))
                 .map(dto -> {
@@ -100,6 +115,7 @@ public class CreditCardServiceImpl implements CreditCardService {
     }
 
     private Mono<CreditCardDto> existAccountByClient(CreditCardDto cardDto) {
+        log.debug("Request to proxy Account by accountNumber: {} and documentNumber: {}", cardDto.getAccountNumber(), cardDto.getClient().getDocumentNumber());
         return accountProxy.findByAccountNumberAndClientDocument(cardDto.getAccountNumber(), cardDto.getClientDocumentNumber())
                 .switchIfEmpty(Mono.error(new DataValidationException("Account not found")))
                 .singleOrEmpty()

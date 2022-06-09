@@ -12,7 +12,8 @@ public interface CreditService {
 
     Flux<CreditDto> findByClientId(String clientId);
 
-    Mono<CreditDto> findWithCardByCreditId(String creditId);
+
+    Mono<CreditDto> findByAccountNumber(String numberAccount);
 
     Flux<CreditDto> findByClientDocumentNumber(String customerId);
 
@@ -21,4 +22,5 @@ public interface CreditService {
     Mono<CreditDto> updateCreditAmount(String id, Double creditAmount);
 
     Mono<CreditDto> updateCreditLimit(String id, Double creditLimit);
+
 }

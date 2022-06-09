@@ -10,6 +10,8 @@ public interface CreditCardService {
 
     Flux<CreditCardDto> findAll();
 
+    Mono<CreditCardDto> findByAccountNumber(String accountNumber);
+
     Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
 
     Mono<CreditCardDto> findByCardNumber(String cardNumber);

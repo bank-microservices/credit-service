@@ -13,7 +13,6 @@ public interface CreditCustomRepository {
 
     Flux<CreditDto> findByClientId(String clientId);
     
-    Mono<CreditDto> findWithCardByCreditId(String creditId);
 
     Flux<CreditDto> findByClientDocumentNumber(String documentNumber);
 
