@@ -3,7 +3,7 @@ package com.nttdata.microservices.credit.service.impl;
 import com.nttdata.microservices.credit.entity.Credit;
 import com.nttdata.microservices.credit.entity.client.ClientType;
 import com.nttdata.microservices.credit.exception.BadRequestException;
-import com.nttdata.microservices.credit.exception.DataValidationException;
+import com.nttdata.microservices.credit.exception.CreditNotFoundException;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditRepository;
 import com.nttdata.microservices.credit.service.CreditService;
@@ -84,16 +84,16 @@ public class CreditServiceImpl implements CreditService {
         log.info("Create credit");
 
         return clientProxy.getClientByDocumentNumber(creditDto.getClientDocumentNumber())
-                .switchIfEmpty(Mono.error(new DataValidationException("Client not found")))
+                .switchIfEmpty(Mono.error(new BadRequestException("Client not found")))
                 .doOnNext(creditDto::setClient)
                 .then(creditRepository.findByAccountNumber(creditDto.getAccountNumber())
-                        .flatMap(r -> Mono.error(new DataValidationException("Account number already has a credit")))
+                        .flatMap(r -> Mono.error(new BadRequestException("Account number already has a credit")))
                         .then())
                 .then(creditRepository.findByClientDocumentNumber(creditDto.getClientDocumentNumber())
                         .count()
                         .<Long>handle((item, sink) -> {
                             if (item > 0 && creditDto.getClient().getClientType() == ClientType.PERSONAL) {
-                                sink.error(new DataValidationException("Personal customer already has a credit"));
+                                sink.error(new BadRequestException("Personal customer already has a credit"));
                             } else {
                                 sink.complete();
                             }
@@ -120,7 +120,7 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public Mono<CreditDto> updateCreditAmount(String id, Double creditAmount) {
         return creditRepository.findById(id)
-                .switchIfEmpty(Mono.error(new DataValidationException("Credit not found")))
+                .switchIfEmpty(Mono.error(new CreditNotFoundException("Credit not found")))
                 .map(credit -> {
                     double totalAmount = Double.sum(creditAmount, credit.getAmount());
                     if (totalAmount > credit.getCreditLimit()) {
@@ -147,7 +147,7 @@ public class CreditServiceImpl implements CreditService {
     @Override
     public Mono<CreditDto> updateCreditLimit(String id, Double creditLimit) {
         return creditRepository.findById(id)
-                .switchIfEmpty(Mono.error(new DataValidationException("Credit not found")))
+                .switchIfEmpty(Mono.error(new CreditNotFoundException("Credit not found")))
                 .map(credit -> {
                     if (credit.getAmount() > creditLimit) {
                         throw new BadRequestException("The new credit limit is less than the current credit amount");

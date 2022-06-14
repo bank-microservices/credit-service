@@ -2,6 +2,8 @@ package com.nttdata.microservices.credit.exceptionhandler;
 
 import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.ClientNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditNotFoundException;
 import com.nttdata.microservices.credit.exception.DataValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -38,7 +40,21 @@ public class GlobalErrorHandler {
     public ResponseEntity<String> handleClientException(ClientNotFoundException ex) {
         log.error("Exception caught in handleClientException :  {} ", ex.getMessage(), ex);
         log.info("Status value is : {}", ex.getStatusCode());
-        return ResponseEntity.status(HttpStatus.valueOf(ex.getStatusCode())).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CreditCardNotFoundException.class)
+    public ResponseEntity<String> handleClientException(CreditCardNotFoundException ex) {
+        log.error("Exception caught in handleCreditCardException :  {} ", ex.getMessage(), ex);
+        log.info("Status value is : {}", ex.getStatusCode());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(CreditNotFoundException.class)
+    public ResponseEntity<String> handleClientException(CreditNotFoundException ex) {
+        log.error("Exception caught in handleCreditException :  {} ", ex.getMessage(), ex);
+        log.info("Status value is : {}", ex.getStatusCode());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @ExceptionHandler(DataValidationException.class)

@@ -6,7 +6,7 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      database: customerdb
+      database: creditdb
       auto-index-creation: false
   jackson:
     default-property-inclusion: NON_NULL
@@ -15,4 +15,4 @@ service:
   client:
     uri: http://localhost:8081/api/client
   account:
-    uri: http://localhost:8085/api/v1/account
+    uri: http://localhost:8083/api/v1/account

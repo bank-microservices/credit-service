@@ -1,7 +1,8 @@
 package com.nttdata.microservices.credit.service.impl;
 
-import com.nttdata.microservices.credit.entity.CreditCard;
-import com.nttdata.microservices.credit.exception.DataValidationException;
+import com.nttdata.microservices.credit.exception.BadRequestException;
+import com.nttdata.microservices.credit.exception.ClientNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
 import com.nttdata.microservices.credit.proxy.AccountProxy;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditCardRepository;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @Service
@@ -82,7 +84,6 @@ public class CreditCardServiceImpl implements CreditCardService {
                 .map(cardMapper::toDto);
     }
 
-
     /**
      * It creates a new credit card and returns it
      *
@@ -93,36 +94,34 @@ public class CreditCardServiceImpl implements CreditCardService {
     public Mono<CreditCardDto> create(CreditCardDto cardDto) {
         log.debug("Request to create Credit Card : {}", cardDto);
         return cardRepository.findByCardNumber(cardDto.getCardNumber())
-                .flatMap(r -> Mono.error(new DataValidationException("Card number already exist")))
+                .flatMap(r -> Mono.error(new BadRequestException("Card number already exist")))
                 .then(existClient(cardDto))
                 .then(existAccountByClient(cardDto))
-                .flatMap(dto -> {
-                    CreditCard creditCard = cardMapper.toEntity(dto);
-                    creditCard.setStatus(true);
-                    return cardRepository.insert(creditCard)
-                            .map(cardMapper::toDto);
-                });
+                .map(cardMapper::toEntity)
+                .map(entity -> {
+                    entity.setStatus(true);
+                    return entity;
+                })
+                .flatMap(cardRepository::insert)
+                .map(cardMapper::toDto)
+                .subscribeOn(Schedulers.boundedElastic());
     }
 
     private Mono<CreditCardDto> existClient(CreditCardDto cardDto) {
-        log.debug("Request to proxy Client by documentNumber: {}", cardDto.getClient().getDocumentNumber());
+        log.debug("Request to proxy Client by documentNumber: {}", cardDto.getClientDocumentNumber());
         return clientProxy.getClientByDocumentNumber(cardDto.getClientDocumentNumber())
-                .switchIfEmpty(Mono.error(new DataValidationException("Client not found")))
-                .map(dto -> {
-                    cardDto.setClient(dto);
-                    return cardDto;
-                });
+                .switchIfEmpty(Mono.error(new ClientNotFoundException("Client not found")))
+                .doOnNext(cardDto::setClient)
+                .thenReturn(cardDto);
     }
 
     private Mono<CreditCardDto> existAccountByClient(CreditCardDto cardDto) {
-        log.debug("Request to proxy Account by accountNumber: {} and documentNumber: {}", cardDto.getAccountNumber(), cardDto.getClient().getDocumentNumber());
+        log.debug("Request to proxy Account by accountNumber: {} and documentNumber: {}", cardDto.getAccountNumber(), cardDto.getClientDocumentNumber());
         return accountProxy.findByAccountNumberAndClientDocument(cardDto.getAccountNumber(), cardDto.getClientDocumentNumber())
-                .switchIfEmpty(Mono.error(new DataValidationException("Account not found")))
+                .switchIfEmpty(Mono.error(new CreditCardNotFoundException("Account not found")))
                 .singleOrEmpty()
-                .map(dto -> {
-                    cardDto.setAccount(dto);
-                    return cardDto;
-                });
+                .doOnNext(cardDto::setAccount)
+                .thenReturn(cardDto);
     }
 
     /**
