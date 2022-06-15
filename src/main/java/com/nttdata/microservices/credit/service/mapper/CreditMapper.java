@@ -12,10 +12,10 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface CreditMapper extends EntityMapper<CreditDto, Credit> {
 
-    @Mapping(target = "client", source = "client", qualifiedByName = "creditClient")
-    CreditDto toDto(Credit entity);
+  @Mapping(target = "client", source = "client", qualifiedByName = "creditClient")
+  CreditDto toDto(Credit entity);
 
-    @Named("creditClient")
-    ClientDto toDtoClient(Client client);
+  @Named("creditClient")
+  ClientDto toDtoClient(Client client);
 
 }

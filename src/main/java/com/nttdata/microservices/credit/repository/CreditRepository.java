@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface CreditRepository extends ReactiveMongoRepository<Credit, String>, CreditCustomRepository {
 
-    Mono<Credit> findByAccountNumber(String accountNumber);
+  Mono<Credit> findByAccountNumber(String accountNumber);
 
 }

@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Credit extends AbstractAuditingEntity {
 
-    @Id
-    private String id;
-    private String accountNumber;
-    private String cci;
-    private double creditLimit;
-    private double amount;
-    private Client client;
-    private LocalDateTime registerDate;
-    private boolean status = true;
+  @Id
+  private String id;
+  private String accountNumber;
+  private String cci;
+  private double creditLimit;
+  private double amount;
+  private Client client;
+  private LocalDateTime registerDate;
+  private boolean status = true;
 }

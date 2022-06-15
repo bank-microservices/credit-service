@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ClientDto {
 
-    private String id;
+  private String id;
 
-    private String documentNumber;
+  private String documentNumber;
 
-    private String firstNameBusiness;
+  private String firstNameBusiness;
 
-    private String surnames;
+  private String surnames;
 
-    private ClientType clientType;
+  private ClientType clientType;
 }

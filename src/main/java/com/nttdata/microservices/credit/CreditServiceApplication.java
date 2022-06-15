@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 @EnableMongoAuditing
 public class CreditServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CreditServiceApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(CreditServiceApplication.class, args);
+  }
 
 }

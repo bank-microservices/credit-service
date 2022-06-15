@@ -7,13 +7,13 @@ import reactor.core.publisher.Mono;
 
 public interface CreditCustomRepository {
 
-    Flux<CreditDto> findAllCredits();
+  Flux<CreditDto> findAllCredits();
 
-    Mono<CreditDto> findByCreditId(String creditId);
+  Mono<CreditDto> findByCreditId(String creditId);
 
-    Flux<CreditDto> findByClientId(String clientId);
-    
+  Flux<CreditDto> findByClientId(String clientId);
 
-    Flux<CreditDto> findByClientDocumentNumber(String documentNumber);
+
+  Flux<CreditDto> findByClientDocumentNumber(String documentNumber);
 
 }

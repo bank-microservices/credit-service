@@ -5,8 +5,8 @@ import reactor.core.publisher.Mono;
 
 public interface ClientProxy {
 
-    Mono<ClientDto> getClientByDocumentNumber(String documentNumber);
+  Mono<ClientDto> getClientByDocumentNumber(String documentNumber);
 
-    Mono<ClientDto> getClientById(String id);
+  Mono<ClientDto> getClientById(String id);
 
 }

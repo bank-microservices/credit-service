@@ -7,10 +7,10 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 
 @Data
 public class AccountType {
-    private String id;
-    private String code;
+  private String id;
+  private String code;
 
-    @ReadOnlyProperty
-    private String description;
+  @ReadOnlyProperty
+  private String description;
 
 }

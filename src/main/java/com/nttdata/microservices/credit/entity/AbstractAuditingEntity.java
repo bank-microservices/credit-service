@@ -12,22 +12,22 @@ import java.time.LocalDateTime;
 @Data
 public class AbstractAuditingEntity implements Serializable {
 
-    @Field("created_by")
-    @JsonIgnore
-    private String createdBy;
+  @Field("created_by")
+  @JsonIgnore
+  private String createdBy;
 
-    @CreatedDate
-    @Field("created_date")
-    @JsonIgnore
-    private LocalDateTime createdDate = LocalDateTime.now();
+  @CreatedDate
+  @Field("created_date")
+  @JsonIgnore
+  private LocalDateTime createdDate = LocalDateTime.now();
 
-    @Field("last_modified_by")
-    @JsonIgnore
-    private String lastModifiedBy;
+  @Field("last_modified_by")
+  @JsonIgnore
+  private String lastModifiedBy;
 
-    @LastModifiedDate
-    @Field("last_modified_date")
-    @JsonIgnore
-    private LocalDateTime lastModifiedDate = LocalDateTime.now();
+  @LastModifiedDate
+  @Field("last_modified_date")
+  @JsonIgnore
+  private LocalDateTime lastModifiedDate = LocalDateTime.now();
 
 }

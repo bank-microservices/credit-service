@@ -6,21 +6,21 @@ import reactor.core.publisher.Mono;
 
 public interface CreditService {
 
-    Flux<CreditDto> findAllCredits();
+  Flux<CreditDto> findAllCredits();
 
-    Mono<CreditDto> findByCreditId(String creditId);
+  Mono<CreditDto> findByCreditId(String creditId);
 
-    Flux<CreditDto> findByClientId(String clientId);
+  Flux<CreditDto> findByClientId(String clientId);
 
 
-    Mono<CreditDto> findByAccountNumber(String numberAccount);
+  Mono<CreditDto> findByAccountNumber(String numberAccount);
 
-    Flux<CreditDto> findByClientDocumentNumber(String customerId);
+  Flux<CreditDto> findByClientDocumentNumber(String customerId);
 
-    Mono<CreditDto> createCredit(CreditDto creditDto);
+  Mono<CreditDto> createCredit(CreditDto creditDto);
 
-    Mono<CreditDto> updateCreditAmount(String id, Double creditAmount);
+  Mono<CreditDto> updateCreditAmount(String id, Double creditAmount);
 
-    Mono<CreditDto> updateCreditLimit(String id, Double creditLimit);
+  Mono<CreditDto> updateCreditLimit(String id, Double creditLimit);
 
 }

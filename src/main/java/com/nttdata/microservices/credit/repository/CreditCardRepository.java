@@ -8,6 +8,6 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface CreditCardRepository extends ReactiveMongoRepository<CreditCard, String>, CreditCardCustomRepository {
 
-    Mono<CreditCard> findByCardNumber(String cardNumber);
+  Mono<CreditCard> findByCardNumber(String cardNumber);
 
 }

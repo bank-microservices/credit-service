@@ -7,7 +7,7 @@ import reactor.core.publisher.Mono;
 
 public interface CreditCardCustomRepository {
 
-    Mono<CreditCardDto> findByAccountNumber(String creditId);
+  Mono<CreditCardDto> findByAccountNumber(String creditId);
 
-    Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
+  Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
 }

@@ -14,19 +14,19 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CreditCardCustomRepositoryImpl implements CreditCardCustomRepository {
 
-    private final ReactiveMongoTemplate reactiveMongoTemplate;
+  private final ReactiveMongoTemplate reactiveMongoTemplate;
 
-    @Override
-    public Mono<CreditCardDto> findByAccountNumber(String accountNumber) {
-        MatchOperation matchStage = Aggregation.match(Criteria.where("account.accountNumber").is(accountNumber));
-        Aggregation aggregation = Aggregation.newAggregation(matchStage);
-        return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class).singleOrEmpty();
-    }
+  @Override
+  public Mono<CreditCardDto> findByAccountNumber(String accountNumber) {
+    MatchOperation matchStage = Aggregation.match(Criteria.where("account.accountNumber").is(accountNumber));
+    Aggregation aggregation = Aggregation.newAggregation(matchStage);
+    return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class).singleOrEmpty();
+  }
 
-    @Override
-    public Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber) {
-        MatchOperation matchStage = Aggregation.match(Criteria.where("client.documentNumber").is(documentNumber));
-        Aggregation aggregation = Aggregation.newAggregation(matchStage);
-        return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class);
-    }
+  @Override
+  public Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber) {
+    MatchOperation matchStage = Aggregation.match(Criteria.where("client.documentNumber").is(documentNumber));
+    Aggregation aggregation = Aggregation.newAggregation(matchStage);
+    return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class);
+  }
 }

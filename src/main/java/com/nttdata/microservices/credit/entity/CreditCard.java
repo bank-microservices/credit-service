@@ -17,15 +17,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CreditCard extends AbstractAuditingEntity {
 
-    @Id
-    private String id;
+  @Id
+  private String id;
 
-    @Indexed(unique = true)
-    private String cardNumber;
-    private String cvv;
-    private Client client;
-    private Account account;
-    private LocalDate expirationDate;
-    private boolean status = true;
+  @Indexed(unique = true)
+  private String cardNumber;
+  private String cvv;
+  private Client client;
+  private Account account;
+  private LocalDate expirationDate;
+  private boolean status = true;
 
 }

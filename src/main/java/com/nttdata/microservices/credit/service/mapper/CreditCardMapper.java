@@ -14,16 +14,16 @@ import org.mapstruct.Named;
 @Mapper(componentModel = "spring")
 public interface CreditCardMapper extends EntityMapper<CreditCardDto, CreditCard> {
 
-    @Mapping(target = "account", source = "account", qualifiedByName = "cardAccount")
-    @Mapping(target = "client", source = "client", qualifiedByName = "cardClient")
-    CreditCardDto toDto(CreditCard entity);
+  @Mapping(target = "account", source = "account", qualifiedByName = "cardAccount")
+  @Mapping(target = "client", source = "client", qualifiedByName = "cardClient")
+  CreditCardDto toDto(CreditCard entity);
 
-    @Named("cardClient")
-    ClientDto toClientDto(Client client);
+  @Named("cardClient")
+  ClientDto toClientDto(Client client);
 
-    @Named("cardAccount")
-    AccountDto toAccountDto(Account account);
+  @Named("cardAccount")
+  AccountDto toAccountDto(Account account);
 
-    Account toAccountEntity(AccountDto entity);
+  Account toAccountEntity(AccountDto entity);
 
 }

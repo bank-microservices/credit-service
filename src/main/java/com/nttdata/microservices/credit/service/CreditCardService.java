@@ -6,22 +6,22 @@ import reactor.core.publisher.Mono;
 
 public interface CreditCardService {
 
-    Mono<CreditCardDto> findById(String id);
+  Mono<CreditCardDto> findById(String id);
 
-    Flux<CreditCardDto> findAll();
+  Flux<CreditCardDto> findAll();
 
-    Mono<CreditCardDto> findByAccountNumber(String accountNumber);
+  Mono<CreditCardDto> findByAccountNumber(String accountNumber);
 
-    Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
+  Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
 
-    Mono<CreditCardDto> findByCardNumber(String cardNumber);
+  Mono<CreditCardDto> findByCardNumber(String cardNumber);
 
-    Mono<CreditCardDto> create(CreditCardDto cardDto);
+  Mono<CreditCardDto> create(CreditCardDto cardDto);
 
-    Mono<CreditCardDto> update(String id, CreditCardDto cardDto);
+  Mono<CreditCardDto> update(String id, CreditCardDto cardDto);
 
-    Mono<CreditCardDto> partialUpdate(String id, CreditCardDto cardDto);
+  Mono<CreditCardDto> partialUpdate(String id, CreditCardDto cardDto);
 
-    Mono<Void> delete(String id);
+  Mono<Void> delete(String id);
 
 }

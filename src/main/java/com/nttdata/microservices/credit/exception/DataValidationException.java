@@ -7,22 +7,22 @@ import lombok.Setter;
 @Getter
 public class DataValidationException extends RuntimeException {
 
-    private String message;
-    private Integer statusCode;
+  private String message;
+  private Integer statusCode;
 
-    public DataValidationException(String message) {
-        super(message);
-        this.message = message;
-    }
+  public DataValidationException(String message) {
+    super(message);
+    this.message = message;
+  }
 
-    public DataValidationException(String message, Integer statusCode) {
-        super(message);
-        this.message = message;
-        this.statusCode = statusCode;
-    }
+  public DataValidationException(String message, Integer statusCode) {
+    super(message);
+    this.message = message;
+    this.statusCode = statusCode;
+  }
 
-    public DataValidationException(String message, Throwable cause) {
-        super(message, cause);
-        this.message = message;
-    }
+  public DataValidationException(String message, Throwable cause) {
+    super(message, cause);
+    this.message = message;
+  }
 }

@@ -7,20 +7,20 @@ import lombok.Setter;
 @Getter
 public class CreditCardNotFoundException extends RuntimeException {
 
-    private String message;
-    private Integer statusCode;
+  private String message;
+  private Integer statusCode;
 
-    public CreditCardNotFoundException(String message, Integer statusCode) {
-        super(message);
-        this.message = message;
-        this.statusCode = statusCode;
-    }
+  public CreditCardNotFoundException(String message, Integer statusCode) {
+    super(message);
+    this.message = message;
+    this.statusCode = statusCode;
+  }
 
-    public CreditCardNotFoundException(String message) {
-        super(message);
-    }
+  public CreditCardNotFoundException(String message) {
+    super(message);
+  }
 
-    public CreditCardNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public CreditCardNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

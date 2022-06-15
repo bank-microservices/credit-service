@@ -7,15 +7,15 @@ import org.springframework.data.annotation.ReadOnlyProperty;
 @Data
 @NoArgsConstructor
 public class Client {
-    private String id;
+  private String id;
 
-    private String documentNumber;
+  private String documentNumber;
 
-    @ReadOnlyProperty
-    private String firstNameBusiness;
+  @ReadOnlyProperty
+  private String firstNameBusiness;
 
-    @ReadOnlyProperty
-    private String surnames;
+  @ReadOnlyProperty
+  private String surnames;
 
-    private ClientType clientType;
+  private ClientType clientType;
 }
