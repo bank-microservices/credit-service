@@ -1,11 +1,7 @@
 package com.nttdata.microservices.credit.exceptionhandler;
 
-import com.nttdata.microservices.credit.exception.BadRequestException;
-import com.nttdata.microservices.credit.exception.ClientNotFoundException;
-import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
-import com.nttdata.microservices.credit.exception.CreditNotFoundException;
-import com.nttdata.microservices.credit.exception.DataValidationException;
-import lombok.extern.slf4j.Slf4j;
+import java.util.stream.Collectors;
+
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +9,20 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
-import java.util.stream.Collectors;
+import com.nttdata.microservices.credit.exception.AccountNotFoundException;
+import com.nttdata.microservices.credit.exception.BadRequestException;
+import com.nttdata.microservices.credit.exception.ClientNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditNotFoundException;
+import com.nttdata.microservices.credit.exception.DataValidationException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalErrorHandler {
+
+  private static final String STATUS_VALUE_IS = "Status value is : {}";
 
   @ExceptionHandler(WebExchangeBindException.class)
   public ResponseEntity<String> handleRequestBodyError(WebExchangeBindException ex) {
@@ -31,35 +36,42 @@ public class GlobalErrorHandler {
   }
 
   @ExceptionHandler(BadRequestException.class)
-  public ResponseEntity<String> handleClientException(BadRequestException ex) {
-    log.error("Exception caught in handleClientException :  {} ", ex.getMessage(), ex);
+  public ResponseEntity<String> handleBadRequestException(BadRequestException ex) {
+    log.error("Exception caught in handleBadRequestException :  {} ", ex.getMessage(), ex);
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
   }
 
   @ExceptionHandler(ClientNotFoundException.class)
-  public ResponseEntity<String> handleClientException(ClientNotFoundException ex) {
-    log.error("Exception caught in handleClientException :  {} ", ex.getMessage(), ex);
-    log.info("Status value is : {}", ex.getStatusCode());
+  public ResponseEntity<String> handleClientNotFoundException(ClientNotFoundException ex) {
+    log.error("Exception caught in handleClientNotFoundException :  {} ", ex.getMessage(), ex);
+    log.info(STATUS_VALUE_IS, ex.getStatusCode());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+  }
+
+  @ExceptionHandler(AccountNotFoundException.class)
+  public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException ex) {
+    log.error("Exception caught in handleAccountNotFoundException :  {} ", ex.getMessage(), ex);
+    log.info(STATUS_VALUE_IS, ex.getStatusCode());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 
   @ExceptionHandler(CreditCardNotFoundException.class)
-  public ResponseEntity<String> handleClientException(CreditCardNotFoundException ex) {
-    log.error("Exception caught in handleCreditCardException :  {} ", ex.getMessage(), ex);
-    log.info("Status value is : {}", ex.getStatusCode());
+  public ResponseEntity<String> handleCreditCardNotFoundException(CreditCardNotFoundException ex) {
+    log.error("Exception caught in handleCreditCardNotFoundException :  {} ", ex.getMessage(), ex);
+    log.info(STATUS_VALUE_IS, ex.getStatusCode());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 
   @ExceptionHandler(CreditNotFoundException.class)
-  public ResponseEntity<String> handleClientException(CreditNotFoundException ex) {
-    log.error("Exception caught in handleCreditException :  {} ", ex.getMessage(), ex);
-    log.info("Status value is : {}", ex.getStatusCode());
+  public ResponseEntity<String> handleCreditNotFoundException(CreditNotFoundException ex) {
+    log.error("Exception caught in handleCreditNotFoundException :  {} ", ex.getMessage(), ex);
+    log.info(STATUS_VALUE_IS, ex.getStatusCode());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 
   @ExceptionHandler(DataValidationException.class)
-  public ResponseEntity<String> handleMovieInfoNotfoundException(DataValidationException ex) {
-    log.error("Exception caught in handleMovieInfoNotfoundException :  {} ", ex.getMessage(), ex);
+  public ResponseEntity<String> handleDataValidationException(DataValidationException ex) {
+    log.error("Exception caught in handleDataValidationException :  {} ", ex.getMessage(), ex);
     return ResponseEntity.status(HttpStatus.valueOf(ex.getStatusCode())).body(ex.getMessage());
   }
 
