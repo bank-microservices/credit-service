@@ -1,13 +1,12 @@
 package com.nttdata.microservices.credit.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Field;
-
-import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Data
 public class AbstractAuditingEntity implements Serializable {

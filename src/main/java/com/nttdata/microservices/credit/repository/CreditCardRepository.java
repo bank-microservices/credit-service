@@ -6,7 +6,8 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface CreditCardRepository extends ReactiveMongoRepository<CreditCard, String>, CreditCardCustomRepository {
+public interface CreditCardRepository
+    extends ReactiveMongoRepository<CreditCard, String>, CreditCardCustomRepository {
 
   Mono<CreditCard> findByCardNumber(String cardNumber);
 

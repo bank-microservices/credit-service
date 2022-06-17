@@ -1,16 +1,15 @@
 package com.nttdata.microservices.credit.service.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
+import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.time.LocalDateTime;
-
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY;
-import static com.fasterxml.jackson.annotation.JsonProperty.Access.WRITE_ONLY;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor

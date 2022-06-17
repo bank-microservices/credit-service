@@ -3,6 +3,7 @@ package com.nttdata.microservices.credit.controller;
 import com.nttdata.microservices.credit.service.CreditCardService;
 import com.nttdata.microservices.credit.service.dto.CreditCardDto;
 import com.nttdata.microservices.credit.util.ResponseUtil;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Valid;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,8 +47,8 @@ public class CreditCardController {
   @GetMapping("/{id}")
   public Mono<ResponseEntity<CreditCardDto>> findById(@PathVariable String id) {
     return cardService.findById(id)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+        .map(ResponseEntity::ok)
+        .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   /**
@@ -72,7 +71,8 @@ public class CreditCardController {
    * @return A Mono of CreditDto
    */
   @GetMapping("/account/{number}")
-  public Mono<ResponseEntity<CreditCardDto>> findByAccountNumber(@PathVariable("number") String accountNumber) {
+  public Mono<ResponseEntity<CreditCardDto>> findByAccountNumber(
+      @PathVariable("number") String accountNumber) {
     Mono<CreditCardDto> dtoMono = cardService.findByAccountNumber(accountNumber);
     return ResponseUtil.wrapOrNotFound(dtoMono);
   }
@@ -95,10 +95,11 @@ public class CreditCardController {
    */
   @PutMapping("/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Mono<ResponseEntity<CreditCardDto>> update(@PathVariable String id, @Valid @RequestBody CreditCardDto customer) {
+  public Mono<ResponseEntity<CreditCardDto>> update(@PathVariable String id,
+                                                    @Valid @RequestBody CreditCardDto customer) {
     return cardService.update(id, customer)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+        .map(ResponseEntity::ok)
+        .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   /**
@@ -112,10 +113,11 @@ public class CreditCardController {
   @PutMapping("/partial/{id}")
   @ResponseStatus(HttpStatus.OK)
   public Mono<ResponseEntity<CreditCardDto>> partialUpdate(@PathVariable String id,
-                                                           @Valid @RequestBody CreditCardDto customer) {
+                                                           @Valid @RequestBody
+                                                           CreditCardDto customer) {
     return cardService.partialUpdate(id, customer)
-            .map(ResponseEntity::ok)
-            .defaultIfEmpty(ResponseEntity.notFound().build());
+        .map(ResponseEntity::ok)
+        .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   /**

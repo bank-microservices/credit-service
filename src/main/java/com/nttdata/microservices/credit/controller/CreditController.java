@@ -1,9 +1,9 @@
 package com.nttdata.microservices.credit.controller;
 
 import com.nttdata.microservices.credit.service.CreditService;
-import com.nttdata.microservices.credit.service.dto.BalanceDto;
 import com.nttdata.microservices.credit.service.dto.CreditDto;
 import com.nttdata.microservices.credit.util.ResponseUtil;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import javax.validation.Valid;
 
 @Slf4j
 @RestController
@@ -47,7 +45,8 @@ public class CreditController {
    * @return A Mono<ResponseEntity<CreditDto>>
    */
   @GetMapping("/account-number/{number}")
-  public Mono<ResponseEntity<CreditDto>> findByAccountNumber(@PathVariable("number") String accountNumber) {
+  public Mono<ResponseEntity<CreditDto>> findByAccountNumber(
+      @PathVariable("number") String accountNumber) {
     log.info("find Credit by accountNumber: {}", accountNumber);
     Mono<CreditDto> dtoMono = creditService.findByAccountNumber(accountNumber);
     return ResponseUtil.wrapOrNotFound(dtoMono);
@@ -75,14 +74,6 @@ public class CreditController {
   public Flux<CreditDto> findByClientId(@PathVariable("clientId") String clientId) {
     log.info("find Credit by clientId: {}", clientId);
     return creditService.findByClientId(clientId);
-  }
-
-  @GetMapping("/balance/{accountNumber}")
-  public Mono<ResponseEntity<BalanceDto>> getBalance(@PathVariable String accountNumber) {
-    log.info("get Balance Credit by accountNumber: {}", accountNumber);
-    return creditService.getBalance(accountNumber)
-        .map(ResponseEntity::ok)
-        .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   /**
@@ -125,7 +116,8 @@ public class CreditController {
    */
   @PutMapping("/limit/{creditId}/{limit}")
   @ResponseStatus(HttpStatus.OK)
-  public Mono<CreditDto> updateCreditLimit(@PathVariable String creditId, @PathVariable Double limit) {
+  public Mono<CreditDto> updateCreditLimit(@PathVariable String creditId,
+                                           @PathVariable Double limit) {
     log.info("update Credit ({}) limit: {}", creditId, limit);
     return creditService.updateCreditLimit(creditId, limit);
   }

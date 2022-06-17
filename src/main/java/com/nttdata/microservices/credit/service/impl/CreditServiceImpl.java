@@ -1,5 +1,7 @@
 package com.nttdata.microservices.credit.service.impl;
 
+import static com.nttdata.microservices.credit.util.MessageUtils.getMsg;
+
 import com.nttdata.microservices.credit.entity.Credit;
 import com.nttdata.microservices.credit.entity.client.ClientType;
 import com.nttdata.microservices.credit.exception.BadRequestException;
@@ -7,18 +9,14 @@ import com.nttdata.microservices.credit.exception.CreditNotFoundException;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditRepository;
 import com.nttdata.microservices.credit.service.CreditService;
-import com.nttdata.microservices.credit.service.dto.BalanceDto;
 import com.nttdata.microservices.credit.service.dto.CreditDto;
 import com.nttdata.microservices.credit.service.mapper.CreditMapper;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-
-import static com.nttdata.microservices.credit.util.MessageUtils.getMsg;
 
 @Slf4j
 @Service
@@ -74,20 +72,6 @@ public class CreditServiceImpl implements CreditService {
   @Override
   public Flux<CreditDto> findByClientDocumentNumber(String documentNumber) {
     return creditRepository.findByClientDocumentNumber(documentNumber);
-  }
-
-  @Override
-  public Mono<BalanceDto> getBalance(String accountNumber) {
-    return Mono.just(accountNumber)
-        .flatMap(number -> this.findByAccountNumber(number)
-            .switchIfEmpty(Mono.error(new CreditNotFoundException((getMsg("credit.not.found")))))
-        )
-        .map(dto -> BalanceDto.builder()
-            .consumed(dto.getAmount())
-            .limit(dto.getCreditLimit())
-            .available(dto.getCreditLimit() - dto.getAmount())
-            .accountNumber(dto.getAccountNumber())
-            .build());
   }
 
   /**

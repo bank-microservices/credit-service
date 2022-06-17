@@ -1,5 +1,7 @@
 package com.nttdata.microservices.credit.service.impl;
 
+import static com.nttdata.microservices.credit.util.MessageUtils.getMsg;
+
 import com.nttdata.microservices.credit.exception.AccountNotFoundException;
 import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.ClientNotFoundException;
@@ -15,8 +17,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-
-import static com.nttdata.microservices.credit.util.MessageUtils.getMsg;
 
 @Slf4j
 @Service
@@ -40,7 +40,7 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<CreditCardDto> findById(String id) {
     log.debug("Request to get Credit Card by Id: {}", id);
     return cardRepository.findById(id)
-            .map(cardMapper::toDto);
+        .map(cardMapper::toDto);
   }
 
   /**
@@ -53,7 +53,7 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Flux<CreditCardDto> findAll() {
     log.debug("Request to get all Credit Cards");
     return cardRepository.findAll()
-            .map(cardMapper::toDto);
+        .map(cardMapper::toDto);
   }
 
   /**
@@ -78,12 +78,12 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<CreditCardDto> findByCardNumber(String cardNumber) {
     log.debug("Request to create Credit Card : {}", cardNumber);
     return cardRepository.findByCardNumber(cardNumber)
-            .flatMap(card -> accountProxy.findByAccountNumber(card.getAccount().getAccountNumber())
-                    .flatMap(account -> {
-                      card.setAccount(cardMapper.toAccountEntity(account));
-                      return Mono.just(card);
-                    }))
-            .map(cardMapper::toDto);
+        .flatMap(card -> accountProxy.findByAccountNumber(card.getAccount().getAccountNumber())
+            .flatMap(account -> {
+              card.setAccount(cardMapper.toAccountEntity(account));
+              return Mono.just(card);
+            }))
+        .map(cardMapper::toDto);
   }
 
   /**
@@ -96,34 +96,36 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<CreditCardDto> create(CreditCardDto cardDto) {
     log.debug("Request to create Credit Card : {}", cardDto);
     return cardRepository.findByCardNumber(cardDto.getCardNumber())
-            .flatMap(r -> Mono.error(new BadRequestException(getMsg("credit.card.already"))))
-            .then(existClient(cardDto))
-            .then(existAccountByClient(cardDto))
-            .map(cardMapper::toEntity)
-            .map(entity -> {
-              entity.setStatus(true);
-              return entity;
-            })
-            .flatMap(cardRepository::insert)
-            .map(cardMapper::toDto)
-            .subscribeOn(Schedulers.boundedElastic());
+        .flatMap(r -> Mono.error(new BadRequestException(getMsg("credit.card.already"))))
+        .then(existClient(cardDto))
+        .then(existAccountByClient(cardDto))
+        .map(cardMapper::toEntity)
+        .map(entity -> {
+          entity.setStatus(true);
+          return entity;
+        })
+        .flatMap(cardRepository::insert)
+        .map(cardMapper::toDto)
+        .subscribeOn(Schedulers.boundedElastic());
   }
 
   private Mono<CreditCardDto> existClient(CreditCardDto cardDto) {
     log.debug("Request to proxy Client by documentNumber: {}", cardDto.getClientDocumentNumber());
     return clientProxy.getClientByDocumentNumber(cardDto.getClientDocumentNumber())
-            .switchIfEmpty(Mono.error(new ClientNotFoundException(getMsg("client.not.found"))))
-            .doOnNext(cardDto::setClient)
-            .thenReturn(cardDto);
+        .switchIfEmpty(Mono.error(new ClientNotFoundException(getMsg("client.not.found"))))
+        .doOnNext(cardDto::setClient)
+        .thenReturn(cardDto);
   }
 
   private Mono<CreditCardDto> existAccountByClient(CreditCardDto cardDto) {
-    log.debug("Request to proxy Account by accountNumber: {} and documentNumber: {}", cardDto.getAccountNumber(), cardDto.getClientDocumentNumber());
-    return accountProxy.findByAccountNumberAndClientDocument(cardDto.getAccountNumber(), cardDto.getClientDocumentNumber())
-            .switchIfEmpty(Mono.error(new AccountNotFoundException(getMsg("account.not.found"))))
-            .singleOrEmpty()
-            .doOnNext(cardDto::setAccount)
-            .thenReturn(cardDto);
+    log.debug("Request to proxy Account by accountNumber: {} and documentNumber: {}",
+        cardDto.getAccountNumber(), cardDto.getClientDocumentNumber());
+    return accountProxy.findByAccountNumberAndClientDocument(cardDto.getAccountNumber(),
+            cardDto.getClientDocumentNumber())
+        .switchIfEmpty(Mono.error(new AccountNotFoundException(getMsg("account.not.found"))))
+        .singleOrEmpty()
+        .doOnNext(cardDto::setAccount)
+        .thenReturn(cardDto);
   }
 
   /**
@@ -138,11 +140,11 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<CreditCardDto> update(String id, CreditCardDto cardDto) {
     log.debug("Request to save Credit Card : {}", cardDto);
     return cardRepository.findById(id)
-            .flatMap(p -> Mono.just(cardDto)
-                    .map(cardMapper::toEntity)
-                    .doOnNext(e -> e.setId(id)))
-            .flatMap(this.cardRepository::save)
-            .map(cardMapper::toDto);
+        .flatMap(p -> Mono.just(cardDto)
+            .map(cardMapper::toEntity)
+            .doOnNext(e -> e.setId(id)))
+        .flatMap(this.cardRepository::save)
+        .map(cardMapper::toDto);
   }
 
   /**
@@ -156,13 +158,13 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<CreditCardDto> partialUpdate(String id, CreditCardDto cardDto) {
     log.debug("Request to partially update Credit Card : {}", cardDto);
     return cardRepository
-            .findById(id)
-            .map(existingCard -> {
-              cardMapper.partialUpdate(existingCard, cardDto);
-              return existingCard;
-            })
-            .flatMap(cardRepository::save)
-            .map(cardMapper::toDto);
+        .findById(id)
+        .map(existingCard -> {
+          cardMapper.partialUpdate(existingCard, cardDto);
+          return existingCard;
+        })
+        .flatMap(cardRepository::save)
+        .map(cardMapper::toDto);
   }
 
   /**
@@ -175,11 +177,11 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<Void> delete(String id) {
     log.debug("Request to delete Credit Card : {}", id);
     return cardRepository.findById(id)
-            .map(card -> {
-              card.setStatus(false);
-              return card;
-            })
-            .flatMap(cardRepository::save)
-            .then();
+        .map(card -> {
+          card.setStatus(false);
+          return card;
+        })
+        .flatMap(cardRepository::save)
+        .then();
   }
 }

@@ -31,7 +31,8 @@ public class CreditCustomRepositoryImpl implements CreditCustomRepository {
   @Override
   public Mono<CreditDto> findByCreditId(String creditId) {
     Aggregation aggregation = getAggregationCredit("_id", new ObjectId(creditId));
-    return reactiveMongoTemplate.aggregate(aggregation, Credit.class, CreditDto.class).singleOrEmpty();
+    return reactiveMongoTemplate.aggregate(aggregation, Credit.class, CreditDto.class)
+        .singleOrEmpty();
   }
 
   @Override

@@ -18,14 +18,17 @@ public class CreditCardCustomRepositoryImpl implements CreditCardCustomRepositor
 
   @Override
   public Mono<CreditCardDto> findByAccountNumber(String accountNumber) {
-    MatchOperation matchStage = Aggregation.match(Criteria.where("account.accountNumber").is(accountNumber));
+    MatchOperation matchStage =
+        Aggregation.match(Criteria.where("account.accountNumber").is(accountNumber));
     Aggregation aggregation = Aggregation.newAggregation(matchStage);
-    return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class).singleOrEmpty();
+    return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class)
+        .singleOrEmpty();
   }
 
   @Override
   public Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber) {
-    MatchOperation matchStage = Aggregation.match(Criteria.where("client.documentNumber").is(documentNumber));
+    MatchOperation matchStage =
+        Aggregation.match(Criteria.where("client.documentNumber").is(documentNumber));
     Aggregation aggregation = Aggregation.newAggregation(matchStage);
     return reactiveMongoTemplate.aggregate(aggregation, CreditCard.class, CreditCardDto.class);
   }

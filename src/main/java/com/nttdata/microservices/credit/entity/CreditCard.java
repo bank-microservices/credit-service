@@ -2,14 +2,13 @@ package com.nttdata.microservices.credit.entity;
 
 import com.nttdata.microservices.credit.entity.account.Account;
 import com.nttdata.microservices.credit.entity.client.Client;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDate;
 
 @Data
 @Document(collection = "credit_card")

@@ -33,7 +33,7 @@ public interface ResponseUtil {
    */
   static <X> Mono<ResponseEntity<X>> wrapOrNotFound(Mono<X> maybeResponse, HttpHeaders headers) {
     return maybeResponse
-            .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-            .map(response -> ResponseEntity.ok().headers(headers).body(response));
+        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+        .map(response -> ResponseEntity.ok().headers(headers).body(response));
   }
 }
