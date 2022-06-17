@@ -13,7 +13,6 @@ public interface CreditCustomRepository {
 
   Flux<CreditDto> findByClientId(String clientId);
 
-
   Flux<CreditDto> findByClientDocumentNumber(String documentNumber);
 
 }

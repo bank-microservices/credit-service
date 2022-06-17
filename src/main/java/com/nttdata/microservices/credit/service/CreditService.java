@@ -1,5 +1,6 @@
 package com.nttdata.microservices.credit.service;
 
+import com.nttdata.microservices.credit.service.dto.BalanceDto;
 import com.nttdata.microservices.credit.service.dto.CreditDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,10 +13,11 @@ public interface CreditService {
 
   Flux<CreditDto> findByClientId(String clientId);
 
-
   Mono<CreditDto> findByAccountNumber(String numberAccount);
 
-  Flux<CreditDto> findByClientDocumentNumber(String customerId);
+  Flux<CreditDto> findByClientDocumentNumber(String documentNumber);
+
+  Mono<BalanceDto> getBalance(String accountNumber);
 
   Mono<CreditDto> createCredit(CreditDto creditDto);
 

@@ -7,6 +7,7 @@ import com.nttdata.microservices.credit.exception.CreditNotFoundException;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditRepository;
 import com.nttdata.microservices.credit.service.CreditService;
+import com.nttdata.microservices.credit.service.dto.BalanceDto;
 import com.nttdata.microservices.credit.service.dto.CreditDto;
 import com.nttdata.microservices.credit.service.mapper.CreditMapper;
 import lombok.RequiredArgsConstructor;
@@ -59,7 +60,7 @@ public class CreditServiceImpl implements CreditService {
   @Override
   public Mono<CreditDto> findByAccountNumber(String accountNumber) {
     return creditRepository.findByAccountNumber(accountNumber)
-            .map(creditMapper::toDto);
+        .map(creditMapper::toDto);
   }
 
   /**
@@ -75,6 +76,20 @@ public class CreditServiceImpl implements CreditService {
     return creditRepository.findByClientDocumentNumber(documentNumber);
   }
 
+  @Override
+  public Mono<BalanceDto> getBalance(String accountNumber) {
+    return Mono.just(accountNumber)
+        .flatMap(number -> this.findByAccountNumber(number)
+            .switchIfEmpty(Mono.error(new CreditNotFoundException((getMsg("credit.not.found")))))
+        )
+        .map(dto -> BalanceDto.builder()
+            .consumed(dto.getAmount())
+            .limit(dto.getCreditLimit())
+            .available(dto.getCreditLimit() - dto.getAmount())
+            .accountNumber(dto.getAccountNumber())
+            .build());
+  }
+
   /**
    * Create credit
    *
@@ -86,28 +101,28 @@ public class CreditServiceImpl implements CreditService {
     log.info("Create credit");
 
     return clientProxy.getClientByDocumentNumber(creditDto.getClientDocumentNumber())
-            .switchIfEmpty(Mono.error(new BadRequestException(getMsg("client.not.found"))))
-            .doOnNext(creditDto::setClient)
-            .then(creditRepository.findByAccountNumber(creditDto.getAccountNumber())
-                    .flatMap(r -> Mono.error(new BadRequestException(getMsg("account.number.already"))))
-                    .then())
-            .then(creditRepository.findByClientDocumentNumber(creditDto.getClientDocumentNumber())
-                    .count()
-                    .<Long>handle((item, sink) -> {
-                      if (item > 0 && creditDto.getClient().getClientType() == ClientType.PERSONAL) {
-                        sink.error(new BadRequestException(getMsg("client.personal.already")));
-                      } else {
-                        sink.complete();
-                      }
-                    }))
-            .then(Mono.just(creditDto)
-                    .flatMap(dto -> {
-                      Credit credit = creditMapper.toEntity(dto);
-                      credit.setRegisterDate(LocalDateTime.now());
-                      return Mono.just(credit);
-                    })
-                    .flatMap(creditRepository::insert)
-                    .map(creditMapper::toDto));
+        .switchIfEmpty(Mono.error(new BadRequestException(getMsg("client.not.found"))))
+        .doOnNext(creditDto::setClient)
+        .then(creditRepository.findByAccountNumber(creditDto.getAccountNumber())
+            .flatMap(r -> Mono.error(new BadRequestException(getMsg("account.number.already"))))
+            .then())
+        .then(creditRepository.findByClientDocumentNumber(creditDto.getClientDocumentNumber())
+            .count()
+            .<Long>handle((item, sink) -> {
+              if (item > 0 && creditDto.getClient().getClientType() == ClientType.PERSONAL) {
+                sink.error(new BadRequestException(getMsg("client.personal.already")));
+              } else {
+                sink.complete();
+              }
+            }))
+        .then(Mono.just(creditDto)
+            .flatMap(dto -> {
+              Credit credit = creditMapper.toEntity(dto);
+              credit.setRegisterDate(LocalDateTime.now());
+              return Mono.just(credit);
+            })
+            .flatMap(creditRepository::insert)
+            .map(creditMapper::toDto));
   }
 
   /**
@@ -122,19 +137,19 @@ public class CreditServiceImpl implements CreditService {
   @Override
   public Mono<CreditDto> updateCreditAmount(String id, Double creditAmount) {
     return creditRepository.findById(id)
-            .switchIfEmpty(Mono.error(new CreditNotFoundException(getMsg("credit.not.found"))))
-            .map(credit -> {
-              double totalAmount = Double.sum(creditAmount, credit.getAmount());
-              if (totalAmount > credit.getCreditLimit()) {
-                throw new BadRequestException(getMsg("credit.exceed.limit"));
-              } else {
-                credit.setAmount(totalAmount);
-                credit.setLastModifiedDate(LocalDateTime.now());
-                return credit;
-              }
-            })
-            .flatMap(creditRepository::save)
-            .map(creditMapper::toDto);
+        .switchIfEmpty(Mono.error(new CreditNotFoundException(getMsg("credit.not.found"))))
+        .map(credit -> {
+          double totalAmount = Double.sum(creditAmount, credit.getAmount());
+          if (totalAmount > credit.getCreditLimit()) {
+            throw new BadRequestException(getMsg("credit.exceed.limit"));
+          } else {
+            credit.setAmount(totalAmount);
+            credit.setLastModifiedDate(LocalDateTime.now());
+            return credit;
+          }
+        })
+        .flatMap(creditRepository::save)
+        .map(creditMapper::toDto);
   }
 
   /**
@@ -149,18 +164,18 @@ public class CreditServiceImpl implements CreditService {
   @Override
   public Mono<CreditDto> updateCreditLimit(String id, Double creditLimit) {
     return creditRepository.findById(id)
-            .switchIfEmpty(Mono.error(new CreditNotFoundException(getMsg("credit.not.found"))))
-            .map(credit -> {
-              if (credit.getAmount() > creditLimit) {
-                throw new BadRequestException(getMsg("credit.less.limit"));
-              } else {
-                credit.setCreditLimit(creditLimit);
-                credit.setLastModifiedDate(LocalDateTime.now());
-                return credit;
-              }
-            })
-            .flatMap(creditRepository::save)
-            .map(creditMapper::toDto);
+        .switchIfEmpty(Mono.error(new CreditNotFoundException(getMsg("credit.not.found"))))
+        .map(credit -> {
+          if (credit.getAmount() > creditLimit) {
+            throw new BadRequestException(getMsg("credit.less.limit"));
+          } else {
+            credit.setCreditLimit(creditLimit);
+            credit.setLastModifiedDate(LocalDateTime.now());
+            return credit;
+          }
+        })
+        .flatMap(creditRepository::save)
+        .map(creditMapper::toDto);
   }
 
 }

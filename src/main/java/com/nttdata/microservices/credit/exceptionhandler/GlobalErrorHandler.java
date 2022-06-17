@@ -1,7 +1,12 @@
 package com.nttdata.microservices.credit.exceptionhandler;
 
-import java.util.stream.Collectors;
-
+import com.nttdata.microservices.credit.exception.AccountNotFoundException;
+import com.nttdata.microservices.credit.exception.BadRequestException;
+import com.nttdata.microservices.credit.exception.ClientNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditNotFoundException;
+import com.nttdata.microservices.credit.exception.DataValidationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,14 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
-import com.nttdata.microservices.credit.exception.AccountNotFoundException;
-import com.nttdata.microservices.credit.exception.BadRequestException;
-import com.nttdata.microservices.credit.exception.ClientNotFoundException;
-import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
-import com.nttdata.microservices.credit.exception.CreditNotFoundException;
-import com.nttdata.microservices.credit.exception.DataValidationException;
-
-import lombok.extern.slf4j.Slf4j;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ControllerAdvice
