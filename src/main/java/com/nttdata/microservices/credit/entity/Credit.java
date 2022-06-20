@@ -1,26 +1,24 @@
 package com.nttdata.microservices.credit.entity;
 
-import com.nttdata.microservices.credit.entity.client.Client;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collection = "credit")
-@AllArgsConstructor
 @NoArgsConstructor
-public class Credit extends AbstractAuditingEntity {
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
+@Document(collection = "credit")
+public class Credit extends Product {
 
   @Id
   private String id;
-  private String accountNumber;
-  private String cci;
-  private double creditLimit;
-  private double amount;
-  private Client client;
   private LocalDateTime registerDate;
-  private boolean status = true;
+
 }

@@ -1,6 +1,5 @@
 package com.nttdata.microservices.credit.exceptionhandler;
 
-import com.nttdata.microservices.credit.exception.AccountNotFoundException;
 import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.ClientNotFoundException;
 import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
@@ -41,13 +40,6 @@ public class GlobalErrorHandler {
   @ExceptionHandler(ClientNotFoundException.class)
   public ResponseEntity<String> handleClientNotFoundException(ClientNotFoundException ex) {
     log.error("Exception caught in handleClientNotFoundException :  {} ", ex.getMessage(), ex);
-    log.info(STATUS_VALUE_IS, ex.getStatusCode());
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-  }
-
-  @ExceptionHandler(AccountNotFoundException.class)
-  public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException ex) {
-    log.error("Exception caught in handleAccountNotFoundException :  {} ", ex.getMessage(), ex);
     log.info(STATUS_VALUE_IS, ex.getStatusCode());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }

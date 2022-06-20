@@ -1,20 +1,20 @@
 package com.nttdata.microservices.credit.entity;
 
-import com.nttdata.microservices.credit.entity.account.Account;
-import com.nttdata.microservices.credit.entity.client.Client;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
-@Document(collection = "credit_card")
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreditCard extends AbstractAuditingEntity {
+@EqualsAndHashCode(callSuper = true)
+@Document(collection = "credit_card")
+public class CreditCard extends Product {
 
   @Id
   private String id;
@@ -22,9 +22,6 @@ public class CreditCard extends AbstractAuditingEntity {
   @Indexed(unique = true)
   private String cardNumber;
   private String cvv;
-  private Client client;
-  private Account account;
   private LocalDate expirationDate;
-  private boolean status = true;
 
 }

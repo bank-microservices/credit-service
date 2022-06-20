@@ -31,26 +31,13 @@ public class ClientProxyImpl implements ClientProxy {
     String errorMessage =
         String.format("There is Client not available with Document Number: %s ", documentNumber);
     return this.webClient.get()
-        .uri("/documentNumber/{number}", documentNumber)
+        .uri("/document-number/{number}", documentNumber)
         .retrieve()
         .onStatus(HttpStatus::is4xxClientError,
             clientResponse -> this.applyError4xx(clientResponse, errorMessage))
         .onStatus(HttpStatus::is5xxServerError, this::applyError5xx)
         .bodyToMono(ClientDto.class);
   }
-
-  @Override
-  public Mono<ClientDto> getClientById(final String id) {
-    String errorMessage = String.format("Client not found with id: %s ", id);
-    return this.webClient.get()
-        .uri("/{id}", id)
-        .retrieve()
-        .onStatus(HttpStatus::is4xxClientError,
-            clientResponse -> this.applyError4xx(clientResponse, errorMessage))
-        .onStatus(HttpStatus::is5xxServerError, this::applyError5xx)
-        .bodyToMono(ClientDto.class);
-  }
-
 
   private Mono<? extends Throwable> applyError4xx(ClientResponse creditResponse,
                                                   String errorMessage) {

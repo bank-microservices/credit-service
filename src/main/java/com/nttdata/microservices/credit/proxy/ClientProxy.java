@@ -7,6 +7,4 @@ public interface ClientProxy {
 
   Mono<ClientDto> getClientByDocumentNumber(String documentNumber);
 
-  Mono<ClientDto> getClientById(String id);
-
 }

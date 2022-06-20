@@ -2,9 +2,12 @@ package com.nttdata.microservices.credit.service.dto;
 
 import com.nttdata.microservices.credit.entity.client.ClientType;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class ClientDto {
 

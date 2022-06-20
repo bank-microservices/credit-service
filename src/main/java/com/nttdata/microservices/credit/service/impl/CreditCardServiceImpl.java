@@ -2,15 +2,16 @@ package com.nttdata.microservices.credit.service.impl;
 
 import static com.nttdata.microservices.credit.util.MessageUtils.getMsg;
 
-import com.nttdata.microservices.credit.exception.AccountNotFoundException;
 import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.ClientNotFoundException;
-import com.nttdata.microservices.credit.proxy.AccountProxy;
+import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
+import com.nttdata.microservices.credit.exception.CreditNotFoundException;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditCardRepository;
 import com.nttdata.microservices.credit.service.CreditCardService;
 import com.nttdata.microservices.credit.service.dto.CreditCardDto;
 import com.nttdata.microservices.credit.service.mapper.CreditCardMapper;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,6 @@ public class CreditCardServiceImpl implements CreditCardService {
   private final CreditCardRepository cardRepository;
 
   private final ClientProxy clientProxy;
-  private final AccountProxy accountProxy;
 
   private final CreditCardMapper cardMapper;
 
@@ -64,25 +64,31 @@ public class CreditCardServiceImpl implements CreditCardService {
    */
   @Override
   public Mono<CreditCardDto> findByAccountNumber(String accountNumber) {
-    log.debug("Request to get Credit Card by accountNumber: {}", accountNumber);
-    return cardRepository.findByAccountNumber(accountNumber);
+    log.debug("find Credit Card by accountNumber: {}", accountNumber);
+    return cardRepository.findByAccountNumber(accountNumber)
+        .map(cardMapper::toDto);
   }
 
   @Override
   public Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber) {
-    log.debug("Request to get Credit Card by Client documentNumber: {}", documentNumber);
-    return cardRepository.findByClientDocumentNumber(documentNumber);
+    log.debug("find Credit Card by Client documentNumber: {}", documentNumber);
+    return cardRepository.findByClientDocumentNumber(documentNumber)
+        .map(cardMapper::toDto);
+  }
+
+  @Override
+  public Mono<CreditCardDto> findByClientDocumentAndCardNumber(String documentNumber,
+                                                               String cardNumber) {
+    log.debug("find Credit Card by Client documentNumber: {} - cardNumber: {}",
+        documentNumber, cardNumber);
+    return cardRepository.findByClientDocumentAndCardNumber(documentNumber, cardNumber)
+        .map(cardMapper::toDto);
   }
 
   @Override
   public Mono<CreditCardDto> findByCardNumber(String cardNumber) {
-    log.debug("Request to create Credit Card : {}", cardNumber);
+    log.debug("find Credit Card by Card Number : {}", cardNumber);
     return cardRepository.findByCardNumber(cardNumber)
-        .flatMap(card -> accountProxy.findByAccountNumber(card.getAccount().getAccountNumber())
-            .flatMap(account -> {
-              card.setAccount(cardMapper.toAccountEntity(account));
-              return Mono.just(card);
-            }))
         .map(cardMapper::toDto);
   }
 
@@ -95,10 +101,10 @@ public class CreditCardServiceImpl implements CreditCardService {
   @Override
   public Mono<CreditCardDto> create(CreditCardDto cardDto) {
     log.debug("Request to create Credit Card : {}", cardDto);
-    return cardRepository.findByCardNumber(cardDto.getCardNumber())
-        .flatMap(r -> Mono.error(new BadRequestException(getMsg("credit.card.already"))))
-        .then(existClient(cardDto))
-        .then(existAccountByClient(cardDto))
+
+    return Mono.just(cardDto)
+        .flatMap(this::existCreditCard)
+        .flatMap(this::existClient)
         .map(cardMapper::toEntity)
         .map(entity -> {
           entity.setStatus(true);
@@ -110,21 +116,20 @@ public class CreditCardServiceImpl implements CreditCardService {
   }
 
   private Mono<CreditCardDto> existClient(CreditCardDto cardDto) {
-    log.debug("Request to proxy Client by documentNumber: {}", cardDto.getClientDocumentNumber());
+    log.debug("find Client by documentNumber: {}", cardDto.getClientDocumentNumber());
+
     return clientProxy.getClientByDocumentNumber(cardDto.getClientDocumentNumber())
         .switchIfEmpty(Mono.error(new ClientNotFoundException(getMsg("client.not.found"))))
         .doOnNext(cardDto::setClient)
         .thenReturn(cardDto);
   }
 
-  private Mono<CreditCardDto> existAccountByClient(CreditCardDto cardDto) {
-    log.debug("Request to proxy Account by accountNumber: {} and documentNumber: {}",
+  private Mono<CreditCardDto> existCreditCard(CreditCardDto cardDto) {
+    log.debug("find Account by accountNumber: {} and documentNumber: {}",
         cardDto.getAccountNumber(), cardDto.getClientDocumentNumber());
-    return accountProxy.findByAccountNumberAndClientDocument(cardDto.getAccountNumber(),
-            cardDto.getClientDocumentNumber())
-        .switchIfEmpty(Mono.error(new AccountNotFoundException(getMsg("account.not.found"))))
-        .singleOrEmpty()
-        .doOnNext(cardDto::setAccount)
+
+    return findByAccountNumber(cardDto.getAccountNumber())
+        .flatMap(r -> Mono.error(new BadRequestException(getMsg("credit.card.already"))))
         .thenReturn(cardDto);
   }
 
@@ -144,6 +149,24 @@ public class CreditCardServiceImpl implements CreditCardService {
             .map(cardMapper::toEntity)
             .doOnNext(e -> e.setId(id)))
         .flatMap(this.cardRepository::save)
+        .map(cardMapper::toDto);
+  }
+
+  @Override
+  public Mono<CreditCardDto> updateCreditCardAmount(String creditCardId, Double amount) {
+    return cardRepository.findById(creditCardId)
+        .switchIfEmpty(Mono.error(new CreditCardNotFoundException(getMsg("credit.card.not.found"))))
+        .map(creditCard -> {
+          double totalAmount = Double.sum(amount, creditCard.getAmount());
+          if (totalAmount > creditCard.getCreditLimit()) {
+            throw new BadRequestException(getMsg("credit.card.exceed.limit"));
+          } else {
+            creditCard.setAmount(totalAmount);
+            creditCard.setLastModifiedDate(LocalDateTime.now());
+            return creditCard;
+          }
+        })
+        .flatMap(cardRepository::save)
         .map(cardMapper::toDto);
   }
 

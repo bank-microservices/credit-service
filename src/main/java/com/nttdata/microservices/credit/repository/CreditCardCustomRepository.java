@@ -1,13 +1,16 @@
 package com.nttdata.microservices.credit.repository;
 
-import com.nttdata.microservices.credit.service.dto.CreditCardDto;
+import com.nttdata.microservices.credit.entity.CreditCard;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 
 public interface CreditCardCustomRepository {
 
-  Mono<CreditCardDto> findByAccountNumber(String creditId);
+  Mono<CreditCard> findByAccountNumber(String creditId);
 
-  Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
+  Flux<CreditCard> findByClientDocumentNumber(String documentNumber);
+
+  Mono<CreditCard> findByClientDocumentAndCardNumber(String documentNumber, String cardNumber);
+
 }

@@ -2,6 +2,7 @@ package com.nttdata.microservices.credit.controller;
 
 import com.nttdata.microservices.credit.service.CreditCardService;
 import com.nttdata.microservices.credit.service.dto.CreditCardDto;
+import com.nttdata.microservices.credit.service.dto.CreditDto;
 import com.nttdata.microservices.credit.util.ResponseUtil;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -100,6 +101,19 @@ public class CreditCardController {
     return cardService.update(id, customer)
         .map(ResponseEntity::ok)
         .defaultIfEmpty(ResponseEntity.notFound().build());
+  }
+
+  /**
+   * It updates the credit card amount with the given amount
+   *
+   * @param creditCardId The id of the credit card to update
+   * @param amount   The amount of credit to be added to the account.
+   * @return A Mono of CreditCardDto
+   */
+  @PutMapping("/amount/{creditCardId}/{amount}")
+  @ResponseStatus(HttpStatus.OK)
+  public Mono<CreditCardDto> updateAmount(@PathVariable String creditCardId, @PathVariable Double amount) {
+    return cardService.updateCreditCardAmount(creditCardId, amount);
   }
 
   /**

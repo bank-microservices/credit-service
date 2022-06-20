@@ -8,10 +8,12 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class CreditDto {
 
@@ -19,28 +21,29 @@ public class CreditDto {
   @JsonProperty(access = WRITE_ONLY)
   private String clientDocumentNumber;
 
-  @NotNull(message = "creditLimit is required")
-  @Positive(message = "creditLimit must be greater than zero (0)")
-  private double creditLimit;
-
   @NotNull(message = "accountNumber is required")
   private String accountNumber;
 
   @NotNull(message = "cci is required")
   private String cci;
 
-  private double amount;
+  @NotNull(message = "creditLimit is required")
+  @Positive(message = "creditLimit must be greater than zero (0)")
+  private Double creditLimit;
+
+  @NotNull(message = "amount is required")
+  @Positive(message = "amount must be greater than zero (0)")
+  private Double amount;
 
   @JsonProperty(access = READ_ONLY)
   private String id;
 
   @JsonProperty(access = READ_ONLY)
-  private ClientDto client;
-
-  @JsonProperty(access = READ_ONLY)
   private LocalDateTime registerDate;
 
   @JsonProperty(access = READ_ONLY)
-  private boolean status;
+  private ClientDto client;
 
+  @JsonProperty(access = READ_ONLY)
+  private Boolean status;
 }

@@ -14,11 +14,15 @@ public interface CreditCardService {
 
   Flux<CreditCardDto> findByClientDocumentNumber(String documentNumber);
 
+  Mono<CreditCardDto> findByClientDocumentAndCardNumber(String documentNumber, String cardNumber);
+
   Mono<CreditCardDto> findByCardNumber(String cardNumber);
 
   Mono<CreditCardDto> create(CreditCardDto cardDto);
 
   Mono<CreditCardDto> update(String id, CreditCardDto cardDto);
+
+  Mono<CreditCardDto> updateCreditCardAmount(String creditCardId, Double amount);
 
   Mono<CreditCardDto> partialUpdate(String id, CreditCardDto cardDto);
 

@@ -87,10 +87,10 @@ public class CreditServiceImpl implements CreditService {
     return clientProxy.getClientByDocumentNumber(creditDto.getClientDocumentNumber())
         .switchIfEmpty(Mono.error(new BadRequestException(getMsg("client.not.found"))))
         .doOnNext(creditDto::setClient)
-        .then(creditRepository.findByAccountNumber(creditDto.getAccountNumber())
+        .then(findByAccountNumber(creditDto.getAccountNumber())
             .flatMap(r -> Mono.error(new BadRequestException(getMsg("account.number.already"))))
             .then())
-        .then(creditRepository.findByClientDocumentNumber(creditDto.getClientDocumentNumber())
+        .then(findByClientDocumentNumber(creditDto.getClientDocumentNumber())
             .count()
             .<Long>handle((item, sink) -> {
               if (item > 0 && creditDto.getClient().getClientType() == ClientType.PERSONAL) {
@@ -103,6 +103,7 @@ public class CreditServiceImpl implements CreditService {
             .flatMap(dto -> {
               Credit credit = creditMapper.toEntity(dto);
               credit.setRegisterDate(LocalDateTime.now());
+              credit.setStatus(true);
               return Mono.just(credit);
             })
             .flatMap(creditRepository::insert)
