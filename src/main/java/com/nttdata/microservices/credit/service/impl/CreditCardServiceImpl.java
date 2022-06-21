@@ -2,10 +2,10 @@ package com.nttdata.microservices.credit.service.impl;
 
 import static com.nttdata.microservices.credit.util.MessageUtils.getMsg;
 
+import com.nttdata.microservices.credit.entity.CreditCard;
 import com.nttdata.microservices.credit.exception.BadRequestException;
 import com.nttdata.microservices.credit.exception.ClientNotFoundException;
 import com.nttdata.microservices.credit.exception.CreditCardNotFoundException;
-import com.nttdata.microservices.credit.exception.CreditNotFoundException;
 import com.nttdata.microservices.credit.proxy.ClientProxy;
 import com.nttdata.microservices.credit.repository.CreditCardRepository;
 import com.nttdata.microservices.credit.service.CreditCardService;
@@ -14,6 +14,7 @@ import com.nttdata.microservices.credit.service.mapper.CreditCardMapper;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -156,14 +157,15 @@ public class CreditCardServiceImpl implements CreditCardService {
   public Mono<CreditCardDto> updateCreditCardAmount(String creditCardId, Double amount) {
     return cardRepository.findById(creditCardId)
         .switchIfEmpty(Mono.error(new CreditCardNotFoundException(getMsg("credit.card.not.found"))))
-        .map(creditCard -> {
-          double totalAmount = Double.sum(amount, creditCard.getAmount());
+        .<CreditCard>handle((creditCard, sink) -> {
+          Double totalAmount = Double.sum(amount,
+              ObjectUtils.defaultIfNull(creditCard.getAmount(), 0D));
           if (totalAmount > creditCard.getCreditLimit()) {
-            throw new BadRequestException(getMsg("credit.card.exceed.limit"));
+            sink.error(new BadRequestException(getMsg("credit.card.exceed.limit")));
           } else {
             creditCard.setAmount(totalAmount);
             creditCard.setLastModifiedDate(LocalDateTime.now());
-            return creditCard;
+            sink.next(creditCard);
           }
         })
         .flatMap(cardRepository::save)
