@@ -1,20 +1,3 @@
-server:
-  port: 8083
-
-spring:
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: creditdb
-      auto-index-creation: false
-  messages:
-    basename: i18n/messages
-    fallback-to-system-locale: true
-    use-code-as-default-message: true
-  jackson:
-    default-property-inclusion: NON_NULL
-
 service:
   client:
     uri: http://localhost:8081/api/v1/client
