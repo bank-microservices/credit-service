@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 @SpringBootApplication
 @EnableMongoAuditing
+@EnableEurekaClient
 public class CreditServiceApplication {
 
   public static void main(String[] args) {
