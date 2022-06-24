@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.nttdata.microservices</groupId>
     <artifactId>credit-service</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>credit-service</name>
     <description>Project for Credit Microservices</description>
     <properties>
